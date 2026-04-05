@@ -3,7 +3,7 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsPositive, IsString, Min, MinLength } from 'class-validator';
+import { IsInt, IsNumber, IsString, Min, MinLength } from 'class-validator';
 
 /**
  * 주문 생성 요청 본문 스키마
@@ -19,12 +19,12 @@ export class CreateOrderDto {
     title: string;
 
     /**
-     * 주문 수량 (양수)
+     * 주문 수량 (1 이상 정수)
      * @example 2
      */
-    @ApiProperty({ description: '주문 수량 (양수)', example: 2 })
-    @IsNumber()
-    @IsPositive()
+    @ApiProperty({ description: '주문 수량 (1 이상 정수)', example: 2 })
+    @IsInt()
+    @Min(1)
     quantity: number;
 
     /**
