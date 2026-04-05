@@ -83,6 +83,22 @@ export class OrderService {
     }
 
     /**
+     * 주문 목록을 페이지네이션으로 조회합니다.
+     *
+     * @param page - 페이지 번호 (1부터 시작)
+     * @param limit - 페이지당 항목 수
+     * @param status - (선택) 주문 상태 필터
+     * @returns [주문 목록, 전체 항목 수]
+     */
+    async findPaginated(
+        page: number,
+        limit: number,
+        status?: OrderStatus,
+    ): Promise<[Order[], number]> {
+        return this.queryRepository.findPaginated(page, limit, status);
+    }
+
+    /**
      * 주문을 접수(PLACED) 상태로 전환합니다.
      * 도메인 규칙(PENDING → PLACED)은 {@link Order.place}에서 검증합니다.
      *

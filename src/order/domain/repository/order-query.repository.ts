@@ -37,4 +37,14 @@ export interface IOrderQueryRepository {
      * @returns 해당 상태의 주문 엔티티 배열
      */
     findByStatus(status: OrderStatus): Promise<Order[]>;
+
+    /**
+     * 주문 목록을 페이지네이션으로 조회합니다.
+     *
+     * @param page - 페이지 번호 (1부터 시작)
+     * @param limit - 페이지당 항목 수
+     * @param status - (선택) 주문 상태 필터
+     * @returns [주문 엔티티 배열, 전체 항목 수]
+     */
+    findPaginated(page: number, limit: number, status?: OrderStatus): Promise<[Order[], number]>;
 }
