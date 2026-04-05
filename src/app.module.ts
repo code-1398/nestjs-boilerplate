@@ -34,7 +34,7 @@ import { OrderModule } from './order/order.module.js';
             password: config.database.password,
             database: config.database.database,
             entities: [__dirname + '/**/*.entity{.ts,.js}'],
-            synchronize: true,
+            synchronize: config.environment === 'dev',
         }),
         DatabaseModule,
         KafkaModule,
