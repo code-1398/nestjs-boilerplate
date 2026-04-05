@@ -1,0 +1,16 @@
+# 의존성 및 빌드 산출물
+node_modules
+dist
+
+# 환경 변수 및 자격증명 (이미지 레이어에 포함되면 레지스트리 push 시 유출 위험)
+.env
+.env.*
+config.json
+
+# Git
+.git
+.gitignore
+
+# 에디터 및 OS
+.DS_Store
+*.log
