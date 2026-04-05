@@ -1,8 +1,8 @@
 /**
  * @fileoverview 주문(Order) 도메인 엔티티
  *
- * 비즈니스 로직과 영속화 매핑을 하나의 클래스에서 담당합니다.
- * TypeORM이 인스턴스 생성 및 컬럼 매핑을 처리하며,
+ * 비즈니스 로직과 TypeORM 영속화 매핑을 하나의 클래스에서 담당합니다.
+ * (Mapper 패턴 미사용 — 도메인 엔티티에 TypeORM 데코레이터 직접 적용)
  * 상태 변경은 반드시 도메인 메서드를 통해서만 수행합니다.
  */
 
@@ -12,7 +12,9 @@ import {
     Entity,
     PrimaryColumn,
     UpdateDateColumn,
+    VersionColumn,
 } from 'typeorm';
+import { DomainException } from '../../common/exceptions/domain.exception';
 
 /** 주문 상태 열거형 */
 export enum OrderStatus {
@@ -58,8 +60,19 @@ export class Order {
     @Column({ type: 'int' })
     quantity: number;
 
-    /** 주문 단가 */
-    @Column({ type: 'decimal', precision: 15, scale: 2 })
+    /**
+     * 주문 단가
+     *
+     * TypeORM의 decimal 타입은 JS로 반환 시 string이므로 transformer로 number 변환합니다.
+     * parseFloat 기반이라 부동소수점 오차가 있을 수 있습니다.
+     * 정밀도가 중요한 금융 도메인에서는 decimal.js 등 전용 라이브러리 또는 정수(센트) 단위 저장을 고려하세요.
+     */
+    @Column({
+        type: 'decimal',
+        precision: 15,
+        scale: 2,
+        transformer: { to: (v: number) => v, from: (v: string) => parseFloat(v) },
+    })
     price: number;
 
     /** 생성 일시 (자동 설정) */
@@ -69,6 +82,10 @@ export class Order {
     /** 마지막 수정 일시 (자동 갱신) */
     @UpdateDateColumn({ type: 'timestamptz' })
     updatedAt: Date;
+
+    /** 낙관적 잠금용 버전 (TypeORM이 자동 관리, 충돌 시 OptimisticLockVersionMismatchError 발생) */
+    @VersionColumn()
+    version: number;
 
     // ──────────────────────────────────────────────
     // 팩토리 메서드
@@ -86,10 +103,10 @@ export class Order {
      */
     static create(id: string, title: string, quantity: number, price: number): Order {
         if (quantity <= 0) {
-            throw new Error('주문 수량은 양수여야 합니다.');
+            throw new DomainException('주문 수량은 양수여야 합니다.');
         }
         if (price < 0) {
-            throw new Error('주문 단가는 0 이상이어야 합니다.');
+            throw new DomainException('주문 단가는 0 이상이어야 합니다.');
         }
         const order = new Order();
         order.id = id;
@@ -111,7 +128,7 @@ export class Order {
      */
     place(): void {
         if (this.status !== OrderStatus.PENDING) {
-            throw new Error(
+            throw new DomainException(
                 `PENDING 상태의 주문만 접수할 수 있습니다. 현재 상태: ${this.status}`,
             );
         }
@@ -125,7 +142,7 @@ export class Order {
      */
     complete(): void {
         if (this.status !== OrderStatus.PLACED) {
-            throw new Error(
+            throw new DomainException(
                 `PLACED 상태의 주문만 완료 처리할 수 있습니다. 현재 상태: ${this.status}`,
             );
         }
@@ -143,7 +160,7 @@ export class Order {
             this.status === OrderStatus.COMPLETED ||
             this.status === OrderStatus.CANCELLED
         ) {
-            throw new Error(
+            throw new DomainException(
                 `완료되었거나 이미 취소된 주문은 취소할 수 없습니다. 현재 상태: ${this.status}`,
             );
         }
@@ -156,6 +173,6 @@ export class Order {
      * @returns 수량 × 단가
      */
     calculateTotal(): number {
-        return this.quantity * Number(this.price);
+        return this.quantity * this.price;
     }
 }
