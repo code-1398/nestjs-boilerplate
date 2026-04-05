@@ -10,14 +10,11 @@ src/
 ├── sse/             - SSE 유틸리티 모듈 (global)
 └── <domain>/        - 도메인 모듈 (DDD 레이어드 구조)
     ├── domain/
-    │   ├── <name>.entity.ts              - 리치 도메인 엔티티 (비즈니스 로직)
+    │   ├── <name>.entity.ts              - 리치 도메인 엔티티 (비즈니스 로직 + TypeORM 데코레이터)
     │   └── repository/
     │       ├── <name>-query.repository.ts     - 조회 인터페이스
     │       └── <name>-command.repository.ts   - 쓰기 인터페이스
     ├── infrastructure/
-    │   ├── persistence/
-    │   │   ├── <name>.orm-entity.ts      - TypeORM ORM 엔티티
-    │   │   └── <name>.mapper.ts          - 도메인 ↔ ORM 변환
     │   └── repository/
     │       ├── <name>-query.repository.impl.ts
     │       └── <name>-command.repository.impl.ts
@@ -34,8 +31,7 @@ src/
 
 ## Naming
 - **파일**: `kebab-case.ts` (예: `order-query.repository.ts`)
-- **ORM 엔티티 파일**: 반드시 `.orm-entity.ts` 접미사 사용 (autoload 패턴과 분리)
-- **도메인 엔티티 파일**: `.entity.ts` 접미사 사용
+- **도메인 엔티티 파일**: `.entity.ts` 접미사 사용 (TypeORM 데코레이터 포함)
 - **클래스**: `PascalCase`
 - **인터페이스**: `I` 접두사 + `PascalCase` (예: `IOrderQueryRepository`)
 - **DI 토큰**: `UPPER_SNAKE_CASE` Symbol (예: `ORDER_QUERY_REPOSITORY`)
@@ -50,7 +46,7 @@ src/
 - Controller는 DTO 변환과 서비스 위임만 담당
 
 ## Error Handling
-- 도메인 규칙 위반: `throw new Error('메시지')` (도메인 엔티티에서)
+- 도메인 규칙 위반: `throw new DomainException('메시지')` (도메인 엔티티에서) → `DomainExceptionFilter`가 400으로 매핑
 - 리소스 없음: `throw new NotFoundException(...)` (서비스에서)
 - 유효성 검증: `class-validator` 데코레이터 (DTO에서)
 

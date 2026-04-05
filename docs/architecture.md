@@ -4,7 +4,7 @@
 - NestJS 기반 RESTful API 서버
 - DDD + 레이어드 아키텍처 (Presentation → Application → Domain ← Infrastructure)
 - 도메인 로직은 Domain Entity에만 위치, Service는 오케스트레이션만 담당
-- TypeORM ORM 엔티티와 도메인 엔티티 분리 (Mapper 패턴)
+- 도메인 엔티티에 TypeORM 데코레이터 직접 적용 (Active Record 스타일, Mapper 패턴 미사용)
 - Kafka(비동기 메시징), S3(파일 저장), SSE(실시간 이벤트) 유틸리티 모듈 제공
 
 ## Components
@@ -13,8 +13,8 @@
 ```
 Presentation Layer  - Controller, DTO (요청/응답 직렬화)
 Application Layer   - Service (유스케이스 오케스트레이션)
-Domain Layer        - Entity (비즈니스 로직), Repository 인터페이스
-Infrastructure Layer - ORM Entity, Repository 구현체, Mapper
+Domain Layer        - Entity (비즈니스 로직 + TypeORM 데코레이터), Repository 인터페이스
+Infrastructure Layer - Repository 구현체
 ```
 
 ### 전역 유틸리티 모듈 (src/)
@@ -33,7 +33,7 @@ Infrastructure Layer - ORM Entity, Repository 구현체, Mapper
 - Outbound: Domain Entity → DTO → HTTP 응답
 
 ## Key Dependencies
-- DB: PostgreSQL (TypeORM, `synchronize: true`)
+- DB: PostgreSQL (TypeORM, `synchronize: dev`만 활성화)
 - Cache: 없음
 - Queue: Kafka (kafkajs, SASL 인증)
 - External APIs: AWS S3 (`@aws-sdk/client-s3`)
