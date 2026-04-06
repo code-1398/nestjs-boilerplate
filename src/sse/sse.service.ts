@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { Response } from 'express';
 import { SSE_EVENT_TYPE } from '@constants/sse.constant';
 
@@ -11,7 +11,7 @@ interface SseClient {
 }
 
 @Injectable()
-export class SseService {
+export class SseService implements OnModuleDestroy {
     private clients = new Map<string, SseClient>();
 
     addClient(clientId: string, response: Response): void {
@@ -97,6 +97,12 @@ export class SseService {
     /** 연결된 모든 클라이언트에게 이벤트를 브로드캐스트합니다. */
     sendMessage(type: string, data: unknown): void {
         this.sendToClients(() => true, type, data);
+    }
+
+    onModuleDestroy(): void {
+        for (const clientId of this.clients.keys()) {
+            this.removeClient(clientId);
+        }
     }
 
     getConnectedClientsCount(): number {
