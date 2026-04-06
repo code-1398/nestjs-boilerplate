@@ -11,7 +11,7 @@ Accepted
 - **DDD 레이어드 아키텍처** 채택: Presentation → Application → Domain ← Infrastructure
 - 도메인 로직은 Domain Entity 에만 위치 (Rich Domain Model)
 - Repository 인터페이스는 Domain 계층, 구현체는 Infrastructure 계층
-- TypeORM ORM 엔티티와 도메인 엔티티 분리 (Mapper 패턴)
+- TypeORM 데코레이터를 도메인 엔티티에 직접 적용 (→ [ADR 0006](0006-domain-entity-typeorm-colocation.md)으로 번복)
 
 ## Alternatives
 - A: 단순 MVC (Controller → Service → Repository): 간단하지만 도메인 로직이 서비스에 집중됨
@@ -24,8 +24,7 @@ Accepted
   - 인프라 변경(DB 교체 등) 시 도메인 영향 없음
   - 코드 구조가 비즈니스 개념을 명확하게 반영
 - cons:
-  - ORM 엔티티 ↔ 도메인 엔티티 매핑 코드 추가 필요
-  - 초기 파일 수 증가 (인터페이스, 구현체, 매퍼 분리)
+  - 초기 파일 수 증가 (인터페이스, 구현체 분리)
 - follow-ups:
   - [ ] 도메인 이벤트(Domain Event) 패턴 도입 검토
   - [ ] CQRS 읽기 모델 분리 검토 (조회 성능 최적화 필요 시)
