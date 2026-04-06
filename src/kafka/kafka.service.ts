@@ -118,6 +118,8 @@ export class KafkaService
             const check = () => {
                 if (this.isConsumerConnected) {
                     resolve();
+                } else if (this.isDestroyed) {
+                    reject(new Error('Kafka consumer connection aborted: module destroyed'));
                 } else if (Date.now() - start >= timeoutMs) {
                     reject(new Error('Kafka consumer connection timed out'));
                 } else {
