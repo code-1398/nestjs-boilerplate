@@ -17,7 +17,7 @@ import { OrderModule } from './order/order.module.js';
 /**
  * 루트 모듈
  *
- * - TypeORM: PostgreSQL 연결 (ORM 엔티티 자동 로드: *.orm-entity.ts)
+ * - TypeORM: PostgreSQL 연결 (엔티티 자동 로드: *.entity.ts)
  * - DatabaseModule: 전역 커넥션 풀(DataSource) + TransactionRunner (global)
  * - KafkaModule: 전역 Kafka 프로듀서/컨슈머 (global)
  * - S3Module: 전역 AWS S3 클라이언트 (global)
@@ -37,8 +37,8 @@ import { OrderModule } from './order/order.module.js';
             synchronize: config.environment === 'dev',
         }),
         DatabaseModule,
-        KafkaModule,
-        S3Module,
+        ...(config.kafka ? [KafkaModule] : []),
+        ...(config.s3 ? [S3Module] : []),
         SseModule,
         OrderModule,
     ],

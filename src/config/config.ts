@@ -13,18 +13,22 @@ const configSchema = z.object({
         password: z.string().min(1),
         database: z.string().min(1),
     }),
-    kafka: z.object({
-        brokers: z.array(z.string()),
-        clientId: z.string().min(1),
-        username: z.string().min(1),
-        password: z.string().min(1),
-    }),
-    s3: z.object({
-        region: z.string().min(1),
-        bucket: z.string().min(1),
-        accessKeyId: z.string().min(1),
-        secretAccessKey: z.string().min(1),
-    }),
+    kafka: z
+        .object({
+            brokers: z.array(z.string()),
+            clientId: z.string().min(1),
+            username: z.string().min(1),
+            password: z.string().min(1),
+        })
+        .optional(),
+    s3: z
+        .object({
+            region: z.string().min(1),
+            bucket: z.string().min(1),
+            accessKeyId: z.string().min(1),
+            secretAccessKey: z.string().min(1),
+        })
+        .optional(),
     environment: z.enum(['dev', 'prod']).default('dev'),
 });
 
