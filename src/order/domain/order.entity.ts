@@ -99,7 +99,7 @@ export class Order {
      * @param quantity - 주문 수량 (양수여야 함)
      * @param price - 주문 단가 (0 이상이어야 함)
      * @returns 생성된 Order 인스턴스
-     * @throws {Error} 수량이 0 이하이거나 단가가 음수인 경우
+     * @throws {DomainException} 수량이 0 이하이거나 단가가 음수인 경우
      */
     static create(id: string, title: string, quantity: number, price: number): Order {
         if (quantity <= 0) {

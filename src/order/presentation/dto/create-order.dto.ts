@@ -3,7 +3,7 @@
  */
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNumber, IsString, Min, MinLength } from 'class-validator';
+import { IsInt, IsNumber, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
 
 /**
  * 주문 생성 요청 본문 스키마
@@ -16,6 +16,7 @@ export class CreateOrderDto {
     @ApiProperty({ description: '주문 제목', example: '갤럭시 S25 주문' })
     @IsString()
     @MinLength(1)
+    @MaxLength(255)
     title: string;
 
     /**
