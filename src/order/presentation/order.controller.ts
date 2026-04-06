@@ -22,8 +22,9 @@ import { OrderService } from '../application/order.service.js';
 import { OrderStatus } from '../domain/order.entity.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { OrderResponseDto } from './dto/order-response.dto.js';
-import { PaginationDto } from '../../common/dto/pagination.dto.js';
 import { PaginatedResponseDto } from '../../common/dto/paginated-response.dto.js';
+import { OrderPaginationQueryDto } from './dto/order-pagination-query.dto.js';
+import { ApiPaginatedResponse } from '../../common/decorators/api-paginated-response.decorator.js';
 
 /**
  * 주문 관리 API 컨트롤러
@@ -72,30 +73,25 @@ export class OrderController {
     /**
      * 주문 목록을 페이지네이션으로 조회합니다.
      *
-     * @param pagination - 페이지 번호 및 페이지당 항목 수
-     * @param status - (선택) 필터링할 주문 상태
+     * @param query - 페이지 번호, 페이지당 항목 수, 상태 필터
      * @returns 페이지네이션된 주문 목록
      */
     @Get('paginated')
     @ApiOperation({ summary: '주문 목록 페이지네이션 조회' })
-    @ApiQuery({ name: 'page', required: false, description: '페이지 번호 (기본값: 1)' })
-    @ApiQuery({ name: 'limit', required: false, description: '페이지당 항목 수 (기본값: 20, 최대: 100)' })
-    @ApiQuery({ name: 'status', enum: OrderStatus, required: false, description: '주문 상태 필터' })
-    @ApiResponse({ status: 200, description: '조회 성공' })
+    @ApiPaginatedResponse(OrderResponseDto)
     async findPaginated(
-        @Query() pagination: PaginationDto,
-        @Query('status') status?: OrderStatus,
+        @Query() query: OrderPaginationQueryDto,
     ): Promise<PaginatedResponseDto<OrderResponseDto>> {
         const [orders, total] = await this.orderService.findPaginated(
-            pagination.page,
-            pagination.limit,
-            status,
+            query.page,
+            query.limit,
+            query.status,
         );
         return PaginatedResponseDto.of(
             orders.map(OrderResponseDto.fromDomain),
             total,
-            pagination.page,
-            pagination.limit,
+            query.page,
+            query.limit,
         );
     }
 
